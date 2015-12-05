@@ -3,40 +3,42 @@ import sys
 import traceback
 import functools
 
-    _CORPUS_DIR = '../data/corpus.txt'
+CORPUS_DIR = '../data/corpus.txt'
+
+global NWORD
 
 def checkCorpus(fn):
     @functools.wraps(fn)
-    def new_func(ins, *args, **kwargs):
-        if not os.path.isfile(Count._CORPUS_DIR):
+    def new_func(*args, **kwargs):
+        if not os.path.isfile(CORPUS_DIR):
             raise IOError('cannot find corpus in data/')
-        return fn(ins, *args, **kwargs)
+        return fn(*args, **kwargs)
     return  new_func
 
 
+@checkCorpus
+def train():
+    global NWORD
+    NWORD = []
+    f = file(CORPUS_DIR).open()
+    for line in f:
+        split = line.split()
+        tmp = {split[0]:split[1]}
+        NWORD.append(tmp)
 
 
+def getTrain():
+    """
+    simple singleton implement
+    """
+    global NWORD
+    try:
+        NWORD
+    except:
+        train()
+    return NWORD
 
-    def __init__(self):
-        self.corpus = []
-        self.nword = []
-        try:
-            self.train()
-        except IOError:
-            print traceback.print_exc(file=sys.stderr)
 
-
-
-    @checkCorpus
-    def train():
-        f = file(_CORPUS_DIR).open()
-        for line in f:
-            split = line.split()
-            tmp = {split[0]:split[1]}
-            nword.append(tmp)
 
 if __name__ == "__main__":
-    c = Count()
-
-
-
+    getTrain()

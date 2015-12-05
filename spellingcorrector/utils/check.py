@@ -8,22 +8,6 @@ def check():
     pass
 
 
-def checkIns():
-
-    def wrapper(fn):
-        @functools.wraps(fn)
-        def new_func(*args, **kwargs):
-            ins = args[1]
-            if isinstance(ins, count.Count):
-                args = list(args)
-                return fn(*args, **kwargs)
-            else:
-                raise TypeError(
-                    'must passed into an instance of utils.count:Conut')
-        return new_func
-    return wrapper
-
-
 def edit1(words):
     """
     edit distance = 1
@@ -37,28 +21,25 @@ def edit1(words):
 
 
 
-@checkIns
-def edit2(words, ins):
+def edit2(words):
     """
     edit diatance = 2
     """
     return set(e2 for e1 in edit1(words)
                for e2 in edit1(e1)
-               if e2 in ins.nwords)
+               if e2 in count.NWORD)
 
 
-@checkIns
-def edit0(words, ins):
+def edit0(words):
     """
     edit distance = 0, that's say the word is correct.
     """
     return set(e0 for e0 in words
-               if e0 in ins.nwords)
+               if e0 in count.NWORD)
 
 
-@checkIns
-def correct(words, ins):
-    candidates = edit0(words, ins) or edit1(words) \
-                    or edit2(words, ins) or [words]
+def correct(words):
+    candidates = edit0(words) or edit1(words) \
+                    or edit2(words) or [words]
     return max(candidates).keys()[0]
 
