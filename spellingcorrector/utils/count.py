@@ -1,16 +1,18 @@
 import os
-import sys
-import traceback
 import functools
 
-CORPUS_DIR = '../data/corpus.txt'
 
-global NWORD
+CORPUS_DIR = str(os.getcwd())[:str(os.getcwd()).index('spellingcorrector/')] \
+             + 'data/corpus.txt'
+
+NWORD = {}
+
 
 def checkCorpus(fn):
     @functools.wraps(fn)
     def new_func(*args, **kwargs):
-        if not os.path.isfile(CORPUS_DIR):
+        t = os.path.isfile(CORPUS_DIR)
+        if t == False:
             raise IOError('cannot find corpus in data/')
         return fn(*args, **kwargs)
     return  new_func
@@ -19,12 +21,11 @@ def checkCorpus(fn):
 @checkCorpus
 def train():
     global NWORD
-    NWORD = []
-    f = file(CORPUS_DIR).open()
-    for line in f:
-        split = line.split()
-        tmp = {split[0]:split[1]}
-        NWORD.append(tmp)
+    with open(CORPUS_DIR, 'r') as f:
+        for line in f:
+            split = line.split()
+            #tmp = {split[0]:float(split[1])}
+            NWORD[split[0]] = float(split[1])
 
 
 def getTrain():
@@ -32,13 +33,13 @@ def getTrain():
     simple singleton implement
     """
     global NWORD
-    try:
-        NWORD
-    except:
+    if len(NWORD) == 0:
         train()
     return NWORD
 
 
-
 if __name__ == "__main__":
     getTrain()
+    print CORPUS_DIR
+    print os.path.isfile(CORPUS_DIR)
+    print len(NWORD)
