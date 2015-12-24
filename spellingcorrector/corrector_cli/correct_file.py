@@ -1,4 +1,5 @@
 import logging
+import re
 
 from cliff.command import Command
 
@@ -16,4 +17,25 @@ class CheckFile(Command):
 
     def take_action(self, parsed_args):
         self.log.info('Starting check [%s]',parsed_args['URI'])
-        return check.check()
+        self.check_file()
+
+    def check_file(self, file_uri):
+        error = []
+        with open(file_uri, 'r') as f:
+            for i,line in enumerate(f):
+                for word in re.split(r'\s+|[.,/\\\[\]]+', line, flags=re.IGNORECASE):
+                    corrected = check.correct(word)
+                    if word != corrected:
+                        error.append((i,word,corrected))
+        self.report(error)
+
+    def report(self, error):
+        for tup in error:
+            print "in line %d\t %s ==> %s\n" % (tup[0],tup[1],tup[2])
+
+# def report(error):
+#     for tup in error:
+#         print "in line %d\t %s ==> %s\n" % (tup[0],tup[1],tup[2])
+#
+# error = [(1,'wor','word')]
+# report(error)
